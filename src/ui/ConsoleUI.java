@@ -233,8 +233,8 @@ public class ConsoleUI {
 
         while(continueUpdating) {
             String orderCodeToUpdate = inputter.getString(
-                    "Enter order code to update (e.g., ORD-12345678): ", Acceptable.STRING_NOT_EMPTY_VALID, "Order code cannot be empty."
-            );
+                    "Enter order code to update (e.g., ORD-12345678): ", Acceptable.ORDER_CODE_VALID, "Order code cannot be empty."
+            ).toUpperCase();
 
             Order existingOrder = orders.searchById(orderCodeToUpdate);
             if (existingOrder == null) {
@@ -252,7 +252,7 @@ public class ConsoleUI {
                     System.out.println("Enter new information (leave blank to keep current):");
 
                     String newMenuId = inputter.getString("New Set Menu ID: ", Acceptable.MENU_ID_VALID, "Invalid menu ID.", true).toUpperCase();
-                    String newNumOfTablesStr = inputter.getString("New Number of Tables: ", Acceptable.INTEGER_VALID, "Invalid number.", true);
+                    String newNumOfTablesStr = inputter.getString("New Number of Tables (must be > 0): ", Acceptable.INTEGER_VALID, "Invalid number.", true);
                     String newEventDateStr = inputter.getString("New Event Date (dd/MM/yyyy): ", Acceptable.DATE_VALID, "Invalid date format.", true);
 
                     Order tempOrder = new Order(); // Create a temporary holder for new values
@@ -269,7 +269,7 @@ public class ConsoleUI {
                     if (!newEventDateStr.isEmpty()) newEventDate = DateUtils.parseDate(newEventDateStr);
                     tempOrder.setEventDate(newEventDate);
 
-                    orders.update(existingOrder);
+                    orders.update(tempOrder);
                 }
             }
             continueUpdating = inputter.getYesNo("Update another order?"); 

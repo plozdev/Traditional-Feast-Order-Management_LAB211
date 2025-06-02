@@ -95,13 +95,11 @@ public class Order implements Serializable {
         this.setMenus = setMenus;
     }
     public long getTotalCost(SetMenu setMenu) {
-        if (this.setMenus == null || this.menuId==null)
-            return 0; //cannot calculate
-        SetMenu setMenu1 = this.setMenus.getMenuById(this.menuId);
-        if (setMenu1==null)
-            return 0; //menu not found
-
-        return (long) (setMenu1.getPrice() * this.numOfTables);
+        if (setMenu==null) {
+            System.err.println("Error: Can't get total cost");
+            return 0;
+        }
+        return (setMenu.getPrice() * this.numOfTables);
     }
   
     @Override
