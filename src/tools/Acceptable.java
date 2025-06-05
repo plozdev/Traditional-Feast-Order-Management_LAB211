@@ -1,5 +1,9 @@
 package tools;
 
+/**
+ * Interface defining various regular expression patterns for input validation.
+ * Also provides a static method to check if data matches a given pattern.
+ */
 public interface Acceptable {
     String CUS_ID_VALID = "^[cgkCGK]\\d{4}$";
     String MENU_ID_VALID = "[Pp][Ww]\\d{3}";
@@ -12,6 +16,14 @@ public interface Acceptable {
     String INTEGER_VALID = "0|[1-9]\\d*";
     String STRING_NOT_EMPTY_VALID = ".+";
 
+
+    /**
+     * Checks if the given data string matches the specified regex pattern.
+     *
+     * @param data    The string data to validate.
+     * @param pattern The regex pattern to match against.
+     * @return true if the data matches the pattern, false otherwise.
+     */
     static boolean isValid (String data, String pattern) {
         return data.matches(pattern);
     }

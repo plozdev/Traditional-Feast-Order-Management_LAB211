@@ -1,12 +1,26 @@
 package model;
 
 import java.io.Serializable;
-public class SetMenu implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private String menuId, menuName;
-    private long price;
-    private String ingredients;
 
+/**
+ * Represents a set menu item in a catering or restaurant system.
+ * This class is serializable to allow for saving and loading menu data.
+ */
+public class SetMenu implements Serializable {
+    private static final long serialVersionUID = 1L; //Recommend for Serializable class
+    private String menuId;      // Unique identifier for the menu
+    private String menuName;    // Name of the menu
+    private long price;         // Price of the menu
+    private String ingredients; // Description of ingredients
+
+    /**
+     * Constructors a new Set Menu
+     *
+     * @param menuId - The unique ID of the menu.
+     * @param menuName - The name of the menu.
+     * @param price - The price of the menu.
+     * @param ingredients - The ingredients of the menu.
+     */
     public SetMenu(String menuId, String menuName, long price, String ingredients) {
         this.menuId = menuId;
         this.menuName = menuName;
@@ -14,9 +28,13 @@ public class SetMenu implements Serializable {
         this.ingredients = ingredients;
     }
 
+    /**
+     * Default constructor
+     */
     public SetMenu() {
     }
 
+    //Getters & Setters
     public String getMenuId() {
         return menuId;
     }
@@ -45,7 +63,12 @@ public class SetMenu implements Serializable {
         return ingredients;
     }
 
-
+    /**
+     * Returns a string representation of the SetMenu object.
+     * Displays menu details including ID, name, price, and ingredients.
+     *
+     * @return A formatted string with menu details.
+     */
     @Override
     public String toString() {
         return String.format("Code       :%s\nName       :%s\nPrice      :%,d Vnd\nIngredients:\n%s",

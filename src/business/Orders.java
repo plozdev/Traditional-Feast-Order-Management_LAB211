@@ -3,11 +3,15 @@ package business;
 import model.Order;
 import model.SetMenu;
 import repository.OrderRepository;
+import tools.DateUtils;
 import tools.Workable;
-
-import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Manages a collection of Order objects
+ * Implements operations on orders data
+ * @author mymym
+ */
 public class Orders implements Workable<Order> {
     private final String pathFile;
     private boolean isSaved;
@@ -18,6 +22,13 @@ public class Orders implements Workable<Order> {
     private final Customers customers;
     private final SetMenus setMenus;
 
+    /**
+     * Constructor initialize repository
+     * Set customers and set of menu in order
+     * @param pathFile  path file
+     * @param customers customer business
+     * @param setMenus  set of menu business
+     */
     public Orders(String pathFile, Customers customers, SetMenus setMenus) {
         this.pathFile = pathFile;
         this.repo = new OrderRepository();
@@ -47,7 +58,13 @@ public class Orders implements Workable<Order> {
         return false;
     }
 
-
+    /**
+     * Adds a new order to the collection.
+     * Validates customer and menu existence, and checks for duplicates before adding.
+     * Sets the data source for the new order to enable detailed display.
+     *
+     * @param newOrder The new order to add.
+     */
     @Override
     public void addNew(Order newOrder) {
         if (newOrder==null) {
@@ -72,24 +89,31 @@ public class Orders implements Workable<Order> {
 
         newOrder.setDataSource(customers, setMenus);
         this.orderMap.put(newOrder.getOrderCode(),newOrder);
-        this.isSaved = false;
+        this.isSaved = false; // Marks as unsaved
         System.out.println("Order placed successfully!");
-        System.out.println(newOrder);
+        System.out.println(newOrder); //Display a new order
     }
    
+    /**
+     * Updates an existing order in the collection.
+     * Validates the existence of the order and the new menu ID.
+     * Sets the data source for the updated order.
+     *
+     * @param updatedOrder The updated order information.
+     */
     @Override
     public void update(Order updateOrder) {
-        if (updateOrder==null || updateOrder.getOrderCode()==null) {
+        if (updateOrder==null || updateOrder.getOrderCode()==null) { //If order is null
             System.out.println("Error: Invalid order data.");
             return ;
         }
 
-        if (!this.orderMap.containsKey(updateOrder.getOrderCode())) {
+        if (!this.orderMap.containsKey(updateOrder.getOrderCode())) { //If order isn't existed in system
             System.out.println("Error: Order not found");
             return ;
         }
 
-        if (setMenus.getMenuById(updateOrder.getMenuId()) == null) {
+        if (setMenus.getMenuById(updateOrder.getMenuId()) == null) { //If menu isn't existed in system
             System.out.println("Error: Menu not found");
             return;
         }
@@ -101,6 +125,13 @@ public class Orders implements Workable<Order> {
         System.out.println(updateOrder); //Display updated order details
     }
 
+    /**
+     * Searches order id in system
+     * If found, set the data source
+     * 
+     * @param id
+     * @return order that existed in system, null otherwise
+     */
     @Override
     public Order searchById(String id) {
         if (id == null || id.isEmpty()) {
@@ -114,6 +145,12 @@ public class Orders implements Workable<Order> {
         return this.orderMap.get(id);
     }
 
+    /**
+     * Shows all of orders that system contains
+     * and show detail information in each order
+     * If empty, show message to user
+     * Sorted in time ascending
+     */
     @Override
     public void showAll () {
         if (this.orderMap.isEmpty()) {
@@ -128,14 +165,13 @@ public class Orders implements Workable<Order> {
         System.out.printf("| %-12s | %-10s | %-11s | %-8s | %-9s | %-5s | %15s |\n",
                 "ID", "Event date", "Customer ID", "Set Menu", "Price", "Table", "Cost");
         System.out.println("--------------------------------------------------------------------------------------------");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         for (Order o : orders) {
             SetMenu menu = setMenus.getMenuById(o.getMenuId());
 
             System.out.printf("| %-12s | %-10s | %-11s | %-8s | %,9d | %5d | %,15d |\n",
                     o.getOrderCode(),
-                    dateFormat.format(o.getEventDate()),
+                    DateUtils.formatDate(o.getEventDate()),
                     o.getCustomerId(),
                     o.getMenuId(),
                     menu.getPrice(),
@@ -145,6 +181,10 @@ public class Orders implements Workable<Order> {
         System.out.println("--------------------------------------------------------------------------------------------");
     }
 
+    /**
+     * Using repository to save data in system, with path file and list of order
+     * Set save status to true and show message
+     */
     @Override
     public void saveToFile() {
         repo.saveToFile(this.pathFile, new ArrayList<>(this.orderMap.values()));
@@ -152,6 +192,11 @@ public class Orders implements Workable<Order> {
         System.out.println("Order data is saved at " + this.pathFile);
     }
 
+    /**
+     * Using repository to read data from file
+     * If order is not exist, initialize new order list and show message
+     * Set save status to true
+     */
     @Override
     public void readFromFile() {
         this.orderMap = repo.loadFromFile(this.pathFile);

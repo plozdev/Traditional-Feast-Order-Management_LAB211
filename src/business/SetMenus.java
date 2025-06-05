@@ -5,22 +5,36 @@ import repository.SetMenuRepository;
 import tools.Workable;
 
 import java.util.*;
+import tools.FileUtils;
 
+/**
+ * Manages a collection of SetMenu Object
+ * Implements operations on set of menu data
+ * @author mymym
+ */
 public class SetMenus implements Workable<SetMenu> {
     private final String pathFile;
     private boolean isFileAvailable = true;
     private transient final SetMenuRepository repo;
     private Map<String, SetMenu> setMenuMap;
+    
+    /**
+     * Constructor
+     * Initializes the repository, sets up the menu map and load data from file in system.
+     * 
+     * @param pathFile path file need to read
+     */
     public SetMenus(String pathFile) {
         super();
         this.pathFile = pathFile;
         this.repo = new SetMenuRepository();
         this.setMenuMap = new HashMap<>();
-        readFromFile(); //Tải dữ liệu khi khởi tạo
+        readFromFile(); //Load data
     }
 
     /**
      * Checking if menuId is existed in list
+     * 
      * @param menuId - ID code of dishes in menu
      * @return True if menu is existed in list, otherwise false
      */
@@ -34,10 +48,11 @@ public class SetMenus implements Workable<SetMenu> {
     public boolean isAvailableFile() { return this.isFileAvailable; }
 
     /**
-     * Show list of dished on the menu
+     * Show list of dished on the menu, sorted by price
+     * If the data or file was not found, show the message
      */
     public void showMenuList() {
-        if (!isFileAvailable) { //Nếu không tìm thấy file để load
+        if (!isFileAvailable) { //If file was not found
             System.out.println("Cannot read data from \"feastMenu.csv\". Please check it.");
             return;
         }
@@ -57,20 +72,26 @@ public class SetMenus implements Workable<SetMenu> {
         }
     }
 
+    /**
+     * Function to check if a menu is existed in system
+     * 
+     * @param menuId Id of menu
+     * @return true if menu is available, otherwise false 
+     */
     public SetMenu getMenuById(String menuId) {
         if (menuId == null) return null;
         return this.setMenuMap.get(menuId.toUpperCase());
     }
 
-    // --- Các phương thức Workable ---
+    // --- Workable methos ---
     @Override
     public void addNew(SetMenu x) {
-        //không hỗ trợ
+        //not support
     }
 
     @Override
     public void update(SetMenu x) {
-        //không hỗ trợ
+        //not support
     }
 
     @Override
@@ -84,30 +105,24 @@ public class SetMenus implements Workable<SetMenu> {
     }
 
     @Override
-    public boolean isSaved() {
-        return true; //always true because cannot edit
-    }
-
-    @Override
     public void saveToFile() {
         //not support
     }
 
     /**
-     *
+     * Read set menus from file
+     * Prints warning if the file is unavailable
      */
     @Override
     public void readFromFile() {
         this.setMenuMap = repo.loadFromFile(this.pathFile);
-        this.isFileAvailable = repo.fileExistsAndReadable(this.pathFile) &&
-                            !this.setMenuMap.isEmpty();
+        boolean isGoodFile = FileUtils.fileExistsAndReadable(this.pathFile);
+        this.isFileAvailable = isGoodFile && !this.setMenuMap.isEmpty();
 
-        if (!repo.fileExistsAndReadable(this.pathFile)) {
+        if (!isGoodFile) {
             System.err.println("Warning: Menu data file is not available or readable.");
         }
-        else if (!isFileAvailable &&
-            repo.fileExistsAndReadable(this.pathFile) &&
-            this.setMenuMap.isEmpty()) {
+        else if (!isFileAvailable && isGoodFile && this.setMenuMap.isEmpty()) {
             System.err.println("Warning: Menu data file is empty.");
         }
     }

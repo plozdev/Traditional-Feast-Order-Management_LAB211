@@ -6,13 +6,28 @@ import tools.Acceptable;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import tools.FileUtils;
 
+/**
+ * 
+ * @author mymym
+ */
 public class SetMenuRepository {
+    /**
+     * Reads data from csv file path 
+     * Creates a File with file path then check if file is available
+     * Uses FileReader and BufferedReader to read each line in file
+     * Convert line to object then put it in A Map
+     * If can't read file of file is unavailable then show error message and return list of empty
+     * 
+     * @param filePath file path
+     * @return A Map contains list of set menus
+     */
     public Map<String, SetMenu> loadFromFile(String filePath) {
         Map<String, SetMenu> menuMap = new HashMap<>();
         File file = new File(filePath);
-        if (!fileExistsAndReadable(filePath)) {
-            return menuMap; // Trả về map rỗng nếu file không đọc được
+        if (!FileUtils.fileExistsAndReadable(filePath)) {
+            return menuMap; //return empty if file can't read
         }
 
         FileReader fr = null;
@@ -21,12 +36,12 @@ public class SetMenuRepository {
         try {
             fr = new FileReader(filePath);
             br = new BufferedReader(fr);
-            br.readLine(); // Bỏ qua dòng header của CSV
+            br.readLine(); // Skip CSV header
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 SetMenu set = dataToObject(line);
-                if (set != null && !menuMap.containsKey(set.getMenuId())) { // Kiểm tra trùng lặp ID trong file
+                if (set != null && !menuMap.containsKey(set.getMenuId())) { //Checks if file is duplicated or not
                     menuMap.put(set.getMenuId(), set);
                 }
             }
@@ -50,9 +65,19 @@ public class SetMenuRepository {
         return menuMap;
     }
 
+    /**
+     * 
+     * Split each string into String array and parse it in Set Menu object
+     * If a line does not contain enough 4 data then return null
+     * Check if price data in csv line is valid
+     * Split ingredients into many line for better UI 
+     * 
+     * @param text Each line is CSV
+     * @return SetMenu Object
+     */
     private SetMenu dataToObject(String text) {
         String[] parts = text.split(",");
-        if (parts.length != 4) return null; //Đảm bảo đủ 4 data
+        if (parts.length != 4) return null; //Make sure it has four datas
         if (!Acceptable.isValid(parts[2],Acceptable.POSITIVE_DOUBLE_VALID))
             return null;
 
@@ -65,13 +90,5 @@ public class SetMenuRepository {
         return new SetMenu(parts[0],parts[1],Long.parseLong(parts[2]),finalIngredients.toString().trim());
     }
 
-    /**
-     * Hàm kiểm tra path File có hoạt động được không
-     * @param filePath
-     * @return true - file tồn tại và đọc được, false - ngược lại
-     */
-    public boolean fileExistsAndReadable(String filePath) {
-        File file = new File(filePath);
-        return file.exists() && file.canRead();
-    }
+    
 }
