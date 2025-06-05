@@ -31,6 +31,15 @@ public class ConsoleUI {
             "8. Display Customer or Order lists." + "\n" +
             "0. Quit\n";
 
+    /**
+     * Constructor 
+     * Initialize customers, set of menus, and orders data from the system or create new
+     * Activate scanner to get input from user
+     * 
+     * @param customers Customer data
+     * @param setMenus  Set of menu data
+     * @param orders    Orders data
+     */
     public ConsoleUI(Customers customers, SetMenus setMenus, Orders orders) {
         this.customers = customers;
         this.setMenus = setMenus;
@@ -39,6 +48,10 @@ public class ConsoleUI {
         this.inputter = new Inputter(this.scanner); // Generating Inputter
     }
 
+    /**
+     * Entry point of program
+     * Show list of functions and get input from user to run one of these functions
+     */
     public void start() {
         int choice;
         boolean isRunning = true;
@@ -116,7 +129,7 @@ public class ConsoleUI {
             Customer newCustomer = new Customer(id, name, phone, email);
             customers.addNew(newCustomer);
 
-            continueRegistering = inputter.getYesNo("Continue entering new customers?");
+            continueRegistering = inputter.getYesNo("Continue entering new customers?"); //Ask for continue or stop
         }
     }
 
